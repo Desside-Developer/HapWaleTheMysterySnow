@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.mechSnow.sTLPluginHWChanges.db.DbPlayerData;
 import org.mechSnow.sTLPluginHWChanges.managers.BarrierManager;
 import org.mechSnow.sTLPluginHWChanges.utils.ConfigUtil;
 
@@ -22,13 +23,15 @@ public class PlayerListener implements Listener {
     private final HashMap<UUID, Boolean> onlineStatus = new HashMap<>();
     private final HashMap<UUID, Double> playerTemperature = new HashMap<>();
     private final BarrierManager barrierManager; // ссылка на BarrierManager
+    // private final DatabaseManager databaseManager;
+    private DbPlayerData dbPlayerData;
 
     // Хранение задач для отображения температуры
     private final HashMap<UUID, BukkitTask> temperatureDisplayTasks = new HashMap<>();
-
-    public PlayerListener(Plugin plugin, BarrierManager barrierManager) {
+    public PlayerListener(Plugin plugin, DbPlayerData dbPlayerData, BarrierManager barrierManager) {
         this.plugin = plugin;
         this.barrierManager = barrierManager;
+        this.dbPlayerData = dbPlayerData;
         this.configUtil = new ConfigUtil(plugin);
     }
 
@@ -38,7 +41,6 @@ public class PlayerListener implements Listener {
         UUID playerId = player.getUniqueId();
 
         // Проверяем данные игрока и создаем, если необходимо
-        configUtil.isPlayerDataCheck(player);
 
         // Обновляем данные при входе
         configUtil.updatePlayerPosition(player);
@@ -79,13 +81,14 @@ public class PlayerListener implements Listener {
         UUID playerId = player.getUniqueId();
 
         // Проверяем данные игрока и создаем, если необходимо
-        configUtil.isPlayerDataCheck(player);
 
         // Обновляем данные перед выходом
         configUtil.updatePlayerPosition(player);
 
         // Сохранение текущей температуры перед выходом
         double currentTemperature = getPlayerTemperature(playerId);
+        // databaseManager.savePlayerData(playerId.toString(), player.getName(), currentTemperature);
+        dbPlayerData.savePlayerData(playerId.toString(), player.getName(), currentTemperature, 0, 0, 0);
         configUtil.updatePlayerTemperature(player, currentTemperature);
 
         // Остановка отображения температуры, если оно активно

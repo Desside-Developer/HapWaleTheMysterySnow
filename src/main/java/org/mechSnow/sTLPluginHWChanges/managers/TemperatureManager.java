@@ -20,6 +20,8 @@ public class TemperatureManager implements Listener {
     private static final double MAX_TEMPERATURE = 323.15;
     private static final double PRIORITY_INFLUENCE = 0.1;
 
+    private final Map<UUID, Integer> currentTemperature = new HashMap<>();
+
     public TemperatureManager(JavaPlugin plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }

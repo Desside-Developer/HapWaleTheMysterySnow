@@ -1,7 +1,6 @@
 package org.mechSnow.sTLPluginHWChanges.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -22,18 +21,11 @@ public class ConfigUtil {
     public ConfigUtil(Plugin plugin) {
         this.plugin = plugin;
         this.gson = new GsonBuilder().setPrettyPrinting().create();
-
-        // Убедитесь, что папка данных плагина существует
         File dataFolder = plugin.getDataFolder();
         if (!dataFolder.exists() && !dataFolder.mkdirs()) {
             logAndShutdown("Не удалось создать папку плагина.");
-            return;
         }
-
-        // Инициализируем configFile после проверки существования папки данных
         this.configFile = new File(dataFolder, "PlayerData.json");
-
-        // Загружаем данные игроков из файла при инициализации
         loadAllPlayerData();
     }
 
@@ -44,15 +36,6 @@ public class ConfigUtil {
         }
 
         String uuid = player.getUniqueId().toString();
-
-        // Check if the player data already exists
-        if (!allPlayerData.containsKey(uuid)) {
-            createNewPlayerData(player);
-        }
-    }
-
-    private void createNewPlayerData(Player player) {
-        String uuid = player.getUniqueId().toString(); // Get UUID here
         Map<String, Object> playerData = new HashMap<>();
         playerData.put("UUID", uuid);
         playerData.put("name", player.getName());
@@ -97,7 +80,6 @@ public class ConfigUtil {
             logAndShutdown("Player object is null.");
             return;
         }
-
         String uuid = player.getUniqueId().toString();
         if (allPlayerData.containsKey(uuid)) {
             allPlayerData.get(uuid).put("lastJoinPositions", Map.of(
@@ -115,12 +97,11 @@ public class ConfigUtil {
             logAndShutdown("Player object is null.");
             return;
         }
-
         String uuid = player.getUniqueId().toString();
         if (allPlayerData.containsKey(uuid)) {
             allPlayerData.get(uuid).put("lastJoinTemperature", temperature);
             saveAllPlayerData();
-            logInfo("Updated temperature for player " + player.getName() + " to " + temperature);
+            logInfo("Обновлена температура для игрока " + player.getName() + " до " + temperature);
         }
     }
 
@@ -141,4 +122,27 @@ public class ConfigUtil {
         plugin.getLogger().log(Level.SEVERE, message);
         plugin.getServer().shutdown();
     }
+
+    public void configSetup() {}
+
+
+//  Logic PlayerData.json
+
+//  PlayerFirstJoin - save all data on json
+    public void savePlayerFirstJoin(Player player) {}
+
+
+
+    public void updatePlayerDataTemperature() {}
+    public void updatePlayerDataPositions() {}
+
+    public void getPlayerData(Player player) {}
+
+//  Logic Barrier.json
+
+    public void updateBarrierSettingsDataCenter() {}
+    public void updateBarrierSettingsDataRadius() {}
+
+    private void getBarrierSettingsDataCenter() {}
+    private void getBarrierSettingsDataRadius() {}
 }

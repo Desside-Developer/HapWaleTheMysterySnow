@@ -5,7 +5,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.mechSnow.sTLPluginHWChanges.managers.TemperatureManager;
 
 import java.util.Random;
 import java.util.UUID;
