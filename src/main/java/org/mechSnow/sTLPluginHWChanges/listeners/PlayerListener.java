@@ -1,5 +1,6 @@
 package org.mechSnow.sTLPluginHWChanges.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -14,14 +15,14 @@ import org.mechSnow.sTLPluginHWChanges.utils.ConfigUtil;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
 import org.bukkit.scheduler.BukkitTask;
 
 public class PlayerListener implements Listener {
     private final Plugin plugin;
-    private final ConfigUtil configUtil;
-    private final HashMap<UUID, PlayerPosition> playerPositions = new HashMap<>();
+    // private final ConfigUtil configUtil;
     private final HashMap<UUID, Boolean> onlineStatus = new HashMap<>();
-    private final HashMap<UUID, Double> playerTemperature = new HashMap<>();
     private final BarrierManager barrierManager; // ссылка на BarrierManager
     // private final DatabaseManager databaseManager;
     private DbPlayerData dbPlayerData;
@@ -32,7 +33,8 @@ public class PlayerListener implements Listener {
         this.plugin = plugin;
         this.barrierManager = barrierManager;
         this.dbPlayerData = dbPlayerData;
-        this.configUtil = new ConfigUtil(plugin);
+        startPlayerPositionChecker();
+        // this.configUtil = new ConfigUtil(plugin);
     }
 
     @EventHandler
@@ -40,84 +42,110 @@ public class PlayerListener implements Listener {
         Player player = event.getPlayer();
         UUID playerId = player.getUniqueId();
 
-        // Проверяем данные игрока и создаем, если необходимо
+        // Проверяем зашёл ли игрок впервый раз на сервер
+        if (!dbPlayerData.checkPlayerExists(player)) {
+            plugin.getLogger().info(player.getName().toString() + " temperature: " + 268.00 + "°Kelvin" + " Player First Join To Server. Saved to DB.");
+            this.updatePlayerTemperature(player, 268.00);
+            dbPlayerData.savePlayerData(player.getUniqueId().toString(), player.getName(), 0, 0, 0, 0);
+        }
+        plugin.getLogger().info("Player " + player.getName() + " on db.");
 
-        // Обновляем данные при входе
-        configUtil.updatePlayerPosition(player);
+        // configUtil.updatePlayerPosition(player);
         onlineStatus.put(playerId, true);
-        playerPositions.put(playerId, new PlayerPosition(
-                player.getLocation().getX(),
-                player.getLocation().getY(),
-                player.getLocation().getZ()
-        ));
+        // playerPositions.put(playerId, new PlayerPosition(
+        //         player.getLocation().getX(),
+        //         player.getLocation().getY(),
+        //         player.getLocation().getZ()
+        // ));
+        dbPlayerData.updatePlayerPosition(player, player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ());
     }
 
-    @EventHandler
-    public void onPlayerMove(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        UUID playerId = player.getUniqueId();
 
-        // Получаем текущие координаты игрока
-        Location playerLocation = player.getLocation();
-        double newX = playerLocation.getX();
-        double newY = playerLocation.getY();
-        double newZ = playerLocation.getZ();
+    public void startPlayerPositionChecker() {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    UUID playerId = player.getUniqueId();
+                    Location playerLocation = player.getLocation();
+                    double newX = playerLocation.getX();
+                    double newY = playerLocation.getY();
+                    double newZ = playerLocation.getZ();
+    
+                    double roundedX = Math.round(newX * 100.0) / 100.0;
+                    double roundedY = Math.round(newY * 100.0) / 100.0;
+                    double roundedZ = Math.round(newZ * 100.0) / 100.0;
+                    
+                    PlayerPosition playerPosition = PlayerListener.this.getPlayerPosition(player.getUniqueId());
+                    if (playerPosition != null) {
+                        player.sendMessage(null, "HASHMAP -> X: " + playerPosition.getX() + " Y: " + playerPosition.getY() + " Z: " + playerPosition.getZ());
+                    }
+                    // else {
+                    //     player.sendMessage(null, "Player position not found for player " + player.getName());
+                    // }
+                    double temperature = dbPlayerData.getPlayerTemperature(playerId);
+                    player.sendMessage("Player " + player.getName() + " temperature: " + temperature + " °Kelvin");
 
-        // Округляем координаты
-        double roundedX = Math.round(newX * 100.0) / 100.0;
-        double roundedY = Math.round(newY * 100.0) / 100.0;
-        double roundedZ = Math.round(newZ * 100.0) / 100.0;
-
-        // Обновляем позицию игрока
-        playerPositions.put(playerId, new PlayerPosition(roundedX, roundedY, roundedZ));
-
-        // Проверяем, находится ли игрок за границей барьера и обрабатываем его позицию
-        barrierManager.handlePlayerPosition(player);
+                    dbPlayerData.updatePlayerPosition(player, roundedX, roundedY, roundedZ);
+                    player.sendMessage(null, "X: " + roundedX + " Y: " + roundedY + " Z: " + roundedZ);
+                }
+            }
+        }, 0L, 5L);
     }
+
+
+    // @EventHandler
+    // public void onPlayerMove(PlayerMoveEvent event) {
+    //     Player player = event.getPlayer();
+    //     UUID playerId = player.getUniqueId();
+
+    //     // Получаем текущие координаты игрока
+    //     Location playerLocation = player.getLocation();
+    //     double newX = playerLocation.getX();
+    //     double newY = playerLocation.getY();
+    //     double newZ = playerLocation.getZ();
+
+    //     // Округляем координаты
+    //     double roundedX = Math.round(newX * 100.0) / 100.0;
+    //     double roundedY = Math.round(newY * 100.0) / 100.0;
+    //     double roundedZ = Math.round(newZ * 100.0) / 100.0;
+
+    //     // Обновляем позицию игрока
+    //     playerPositions.put(playerId, new PlayerPosition(roundedX, roundedY, roundedZ));
+
+    //     // Проверяем, находится ли игрок за границей барьера и обрабатываем его позицию
+    //     // barrierManager.handlePlayerPosition(player);
+    // }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         UUID playerId = player.getUniqueId();
 
-        // Проверяем данные игрока и создаем, если необходимо
+        // configUtil.updatePlayerPosition(player);
 
-        // Обновляем данные перед выходом
-        configUtil.updatePlayerPosition(player);
-
-        // Сохранение текущей температуры перед выходом
         double currentTemperature = getPlayerTemperature(playerId);
-        // databaseManager.savePlayerData(playerId.toString(), player.getName(), currentTemperature);
         dbPlayerData.savePlayerData(playerId.toString(), player.getName(), currentTemperature, 0, 0, 0);
-        configUtil.updatePlayerTemperature(player, currentTemperature);
 
         // Остановка отображения температуры, если оно активно
         stopTemperatureDisplay(playerId);
         onlineStatus.put(playerId, false);
     }
 
-    // Метод получения температуры игрока
     public double getPlayerTemperature(UUID playerId) {
-        return playerTemperature.getOrDefault(playerId, 268.15); // Возвращаем базовую температуру по умолчанию
+        Double temperature = dbPlayerData.getPlayerTemperature(playerId.toString());
+        return temperature;
     }
 
-    // Метод обновления температуры игрока в хэшмапе и конфиге
     public void updatePlayerTemperature(Player player, double temperature) {
-        UUID playerId = player.getUniqueId();
-
-        // Обновление температуры в playerTemperature HashMap
-        playerTemperature.put(playerId, temperature);
-
-        // Обновление температуры в конфиге
-        configUtil.updatePlayerTemperature(player, temperature);
+        dbPlayerData.updatePlayerTemperature(player, temperature);
     }
-
     public boolean isPlayerOnline(UUID playerId) {
         return onlineStatus.getOrDefault(playerId, false);
     }
 
     public PlayerPosition getPlayerPosition(UUID playerId) {
-        return playerPositions.get(playerId);
+        return dbPlayerData.getPlayerPosition(playerId);
     }
 
     // Метод для начала отображения температуры

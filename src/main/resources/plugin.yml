@@ -4,17 +4,17 @@ main: org.mechSnow.sTLPluginHWChanges.STLPluginHWChanges
 api-version: '1.21'
 commands:
   testCMFN:
-    description: "pizdes"
+    description: "I think test command."
     usage: /testCMFN
   setcenter:
-    description: "Установить центр барьера."
+    description: "Set center barrier."
     usage: "/setcenter [x] [y] [z]"
   setradius:
-    description: "Установить радиус барьера."
-    usage: "/setradius <радиус>"
+    description: "Set radius barrier."
+    usage: "/setradius <radius>"
   expandradius:
-    description: "Увеличить радиус барьера."
-    usage: "/expandradius <добавочный_радиус>"
+    description: "Expand radius barrier."
+    usage: "/expandradius <add_radius>"
   getTemperature:
-    description: "Показывает температуру игрока на action bar."
+    description: "Show temperature player on action bar."
     usage: "/getTemperature"

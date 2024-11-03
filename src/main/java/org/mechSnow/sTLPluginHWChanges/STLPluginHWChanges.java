@@ -16,9 +16,11 @@ import org.mechSnow.sTLPluginHWChanges.listeners.OnWaterPlaceListener;
     import org.mechSnow.sTLPluginHWChanges.listeners.PlayerListener;
     import org.mechSnow.sTLPluginHWChanges.utils.ChunkLoadUtil;
     import org.mechSnow.sTLPluginHWChanges.utils.ConfigUtil;
-    import org.mechSnow.sTLPluginHWChanges.managers.DatabaseManager;
+import org.mechSnow.sTLPluginHWChanges.utils.RegisterCommandsUtil;
+import org.mechSnow.sTLPluginHWChanges.managers.DatabaseManager;
+import org.mechSnow.sTLPluginHWChanges.managers.DependencyManager;
 
-    import java.util.Objects;
+import java.util.Objects;
 
     public final class STLPluginHWChanges extends JavaPlugin {
         private BarrierManager barrierManager;
@@ -31,6 +33,7 @@ import org.mechSnow.sTLPluginHWChanges.listeners.OnWaterPlaceListener;
         private IceDropListener iceDropListener;
         private OnWaterPlaceListener onWaterPlaceListener;
         private OnLavaPlaceListener onLavaPlaceListener;
+        private DependencyManager dependencyManager;
         
         private DbPlayerData dbPlayerData;
 
@@ -41,20 +44,24 @@ import org.mechSnow.sTLPluginHWChanges.listeners.OnWaterPlaceListener;
             audiences = BukkitAudiences.create(this);
             barrierManager = new BarrierManager(audiences, this);
             barrierCommand = new BarrierCommand(barrierManager);
-            chunkLoadUtil = new ChunkLoadUtil();
-            iceDropListener = new IceDropListener(); 
-            onWaterPlaceListener = new OnWaterPlaceListener();
-            onLavaPlaceListener = new OnLavaPlaceListener();
-            
+            // chunkLoadUtil = new ChunkLoadUtil();
+            // iceDropListener = new IceDropListener(); 
+            // onWaterPlaceListener = new OnWaterPlaceListener();
+            // onLavaPlaceListener = new OnLavaPlaceListener();
+            TestCommandsFN.registerCommands(this);
+
             databaseManager = new DatabaseManager(this);
             // Databases ( here )
-            dbPlayerData = new DbPlayerData(databaseManager);
+            DependencyManager dependencyManager = new DependencyManager(databaseManager, this, barrierManager);
+            dbPlayerData = dependencyManager.getDbPlayerData();
+            playerListener = dependencyManager.getPlayerListener();
+            // dbPlayerData = new DbPlayerData(databaseManager);
 
-            playerListener = new PlayerListener(this, dbPlayerData, barrierManager);
+            // playerListener = new PlayerListener(this, dbPlayerData, barrierManager);
 
 
             registerListeners();
-            registerCommands();
+            // registerCommands();
 
             getLogger().info("STLPluginHWChanges activate!");
         }
@@ -78,19 +85,22 @@ import org.mechSnow.sTLPluginHWChanges.listeners.OnWaterPlaceListener;
         }
 
         private void registerCommands() {
-            Objects.requireNonNull(getCommand("getTemperature"), "Команда getTemperature не найдена в plugin.yml")
-                    .setExecutor(new GetTemperatureCommand(playerListener, audiences, this));
-
-            Objects.requireNonNull(getCommand("testCMFN"), "Команда testCMFN не найдена в plugin.yml")
-                    .setExecutor(new TestCommandsFN(playerListener));
-
-            Objects.requireNonNull(getCommand("setCenter"), "Команда setCenter не найдена в plugin.yml")
-                    .setExecutor(barrierCommand);
-
-            Objects.requireNonNull(getCommand("setRadius"), "Команда setRadius не найдена в plugin.yml")
-                    .setExecutor(barrierCommand);
-
-            Objects.requireNonNull(getCommand("expandRadius"), "Команда expandRadius не найдена в plugin.yml")
-                    .setExecutor(barrierCommand);
+            TestCommandsFN testCommandsFN = new TestCommandsFN(this);
+            RegisterCommandsUtil.registerCommand(this, "testCMFN", testCommandsFN);
         }
-    }
+
+        //     Objects.requireNonNull(getCommand("getTemperature"), "Команда getTemperature не найдена в plugin.yml")
+        //             .setExecutor(new GetTemperatureCommand(playerListener, audiences, this));
+
+        //     Objects.requireNonNull(getCommand("testCMFN"), "Команда testCMFN не найдена в plugin.yml")
+        //             .setExecutor(new TestCommandsFN(this, playerListener));
+
+        //     Objects.requireNonNull(getCommand("setCenter"), "Команда setCenter не найдена в plugin.yml")
+        //             .setExecutor(barrierCommand);
+
+        //     Objects.requireNonNull(getCommand("setRadius"), "Команда setRadius не найдена в plugin.yml")
+        //             .setExecutor(barrierCommand);
+
+        //     Objects.requireNonNull(getCommand("expandRadius"), "Команда expandRadius не найдена в plugin.yml")
+        //             .setExecutor(barrierCommand);
+}

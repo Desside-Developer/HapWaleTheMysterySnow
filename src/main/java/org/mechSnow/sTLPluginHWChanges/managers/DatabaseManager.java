@@ -1,10 +1,15 @@
 package org.mechSnow.sTLPluginHWChanges.managers;
 
 import org.bukkit.plugin.Plugin;
+import org.bukkit.command.Command;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseManager {
     private final Plugin plugin;
@@ -21,11 +26,17 @@ public class DatabaseManager {
 
     private void connect() {
         try {
-            if (connection == null || connection.isClosed()) {
-                connection = DriverManager.getConnection("jdbc:sqlite:" + plugin.getDataFolder() + "/database.db");
-                plugin.getLogger().info("Connected to the database successfully.");
+            File dataFolder = plugin.getDataFolder();
+            if (!dataFolder.exists()) {
+                dataFolder.mkdirs();
             }
-        } catch (SQLException e) {
+            File databaseFile = new File(dataFolder, "database.db");
+            if (!databaseFile.exists()) {
+                databaseFile.createNewFile();
+            }
+            connection = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getAbsolutePath());
+            plugin.getLogger().info("Connected to the database successfully.");
+        } catch (SQLException | IOException e) {
             plugin.getLogger().severe("Failed to connect to the database: " + e.getMessage());
         }
     }

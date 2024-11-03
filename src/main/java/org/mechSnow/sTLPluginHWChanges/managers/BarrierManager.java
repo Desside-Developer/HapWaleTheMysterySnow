@@ -91,9 +91,9 @@ public class BarrierManager {
         Audience audience = audiences.sender(player);
         Component title = Component.text(message).color(TextColor.fromHexString("#FF0000")); // Красный цвет
         Title.Times times = Title.Times.times(
-                Duration.ofSeconds(1), // Задержка в 1 секунду
-                Duration.ofSeconds(3), // Длительность в 3 секунды
-                Duration.ofSeconds(1)  // Затухание в 1 секунду
+                Duration.ofSeconds(1),
+                Duration.ofSeconds(3),
+                Duration.ofSeconds(1)
         );
         audience.showTitle(Title.title(title, Component.empty(), times)); // Отправка Title сообщения
     }

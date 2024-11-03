@@ -1,16 +1,26 @@
 package org.mechSnow.sTLPluginHWChanges.commands;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.mechSnow.sTLPluginHWChanges.listeners.PlayerListener;
-import java.util.UUID;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
+import org.mechSnow.sTLPluginHWChanges.utils.RegisterCommandsUtil;
 
 public class TestCommandsFN implements CommandExecutor {
-    private final PlayerListener playerListener;
-    public TestCommandsFN(PlayerListener playerListener) {
-        this.playerListener = playerListener;
+    private final Plugin plugin;
+
+    public TestCommandsFN(Plugin plugin) {
+        this.plugin = plugin;
+    }
+
+    public static void registerCommands(Plugin plugin) {
+        RegisterCommandsUtil.registerCommand(plugin, "testCMFN", new TestCommandsFN(plugin));
     }
 
     @Override
@@ -20,17 +30,25 @@ public class TestCommandsFN implements CommandExecutor {
             return true;
         }
         Player player = (Player) sender;
-        UUID playerId = player.getUniqueId();
-        PlayerListener.PlayerPosition position = playerListener.getPlayerPosition(playerId);
-        if (position != null) {
-            player.sendMessage("Текущая позиция: X: " + position.getX() + ", Y: " + position.getY() + ", Z: " + position.getZ());
-        } else {
-            player.sendMessage("Позиция игрока не найдена.");
+        if (!player.hasPermission("admin")) {
+            player.sendMessage("У вас нет доступа к этой команде.");
+            return true;
         }
-
-        boolean isOnline = playerListener.isPlayerOnline(playerId);
-        player.sendMessage("Статус игрока: " + (isOnline ? "онлайн" : "не в сети"));
-
+        openAdminMenu(player);
         return true;
+    }
+
+    private void openAdminMenu(Player player) {
+        Inventory inventory = Bukkit.createInventory(null, 9, "Меню Админа");
+
+        ItemStack item = new ItemStack(Material.DIAMOND);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName("Бриллиант");
+            item.setItemMeta(meta);
+        }
+        inventory.setItem(0, item);
+
+        player.openInventory(inventory);
     }
 }
