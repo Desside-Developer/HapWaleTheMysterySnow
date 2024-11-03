@@ -26,5 +26,3 @@ target/classes/org/mechSnow/sTLPluginHWChanges/managers/TemperatureManager$Facto
 target/classes/org/mechSnow/sTLPluginHWChanges/managers/TickManager.class
 target/classes/org/mechSnow/sTLPluginHWChanges/managers/TickManager$1.class
 target/classes/org/mechSnow/sTLPluginHWChanges/utils/ConfigUtil.class
-target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
-target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
