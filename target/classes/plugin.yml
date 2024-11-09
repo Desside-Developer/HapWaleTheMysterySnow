@@ -4,17 +4,31 @@ main: org.mechSnow.sTLPluginHWChanges.STLPluginHWChanges
 api-version: '1.21'
 commands:
   testCMFN:
-    description: "pizdes"
+    description: "I think test command."
     usage: /testCMFN
+    permission: stlplugin.command.testcmfn  # Пример кастомного разрешения
+
   setcenter:
-    description: "Установить центр барьера."
+    description: "Set center barrier."
     usage: "/setcenter [x] [y] [z]"
+    permission: stlplugin.command.setcenter  # Пример кастомного разрешения
+
   setradius:
-    description: "Установить радиус барьера."
-    usage: "/setradius <радиус>"
+    description: "Set radius barrier."
+    usage: "/setradius <radius>"
+    permission: stlplugin.command.setradius  # Пример кастомного разрешения
+
   expandradius:
-    description: "Увеличить радиус барьера."
-    usage: "/expandradius <добавочный_радиус>"
+    description: "Expand radius barrier."
+    usage: "/expandradius <add_radius>"
+    permission: stlplugin.command.expandradius  # Пример кастомного разрешения
+
   getTemperature:
-    description: "Показывает температуру игрока на action bar."
+    description: "Show temperature player on action bar."
     usage: "/getTemperature"
+    permission: stlplugin.command.gettemperature  # Пример кастомного разрешения
+
+  snowBarrier:
+    description: "Set snow barrier."
+    usage: "/snowBarrier <x> <y> <z> <radius> [Name: <name>]"
+    permission: stlplugin.command.snowbarrier  # Пример кастомного разрешения

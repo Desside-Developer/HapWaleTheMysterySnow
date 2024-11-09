@@ -26,12 +26,28 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <compilerArgs>
+                        <arg>-parameters</arg> <!-- Это важно для ACF -->
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.5.3</version>
+                <configuration>
+                    <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
+                    <relocations>
+                        <relocation>
+                            <pattern>co.aikar.commands</pattern>
+                            <shadedPattern>org.mechSnow.stlpluginhwchanges.acf</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>co.aikar.locales</pattern>
+                            <shadedPattern>org.mechSnow.stlpluginhwchanges.locales</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -52,12 +68,16 @@
 
     <repositories>
         <repository>
+            <id>sonatype</id>
+            <url>https://oss.sonatype.org/content/groups/public/</url>
+        </repository>
+        <repository>
             <id>spigotmc-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
         <repository>
-            <id>sonatype</id>
-            <url>https://oss.sonatype.org/content/groups/public/</url>
+            <id>papermc-repo</id>
+            <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
         <repository>
             <id>bungee-repo</id>
@@ -66,6 +86,14 @@
         <repository>
             <id>central</id>
             <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+        <repository>
+            <id>aikar</id>
+            <url>https://repo.aikar.co/content/groups/aikar/</url>
+        </repository>
+        <repository>
+            <id>dv8tion</id>
+            <url>https://repo.dv8tion.net/repository/maven-releases/</url>
         </repository>
     </repositories>
 
@@ -76,11 +104,6 @@
             <version>1.21.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>net.md-5</groupId>-->
-<!--            <artifactId>bungeecord-api</artifactId>-->
-<!--            <version>1.20-R0.2</version> &lt;!&ndash; Используйте последнюю стабильную версию &ndash;&gt;-->
-<!--        </dependency>-->
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-text-minimessage</artifactId>
@@ -91,5 +114,31 @@
             <artifactId>adventure-platform-bukkit</artifactId>
             <version>4.3.4</version>
         </dependency>
+       <dependency>
+           <groupId>net.gmcbm.dependencies</groupId>
+           <artifactId>acf-paper</artifactId>
+           <version>0.5.2</version>
+       </dependency>
+       <dependency>
+           <groupId>net.gmcbm.dependencies</groupId>
+           <artifactId>acf-brigadier</artifactId>
+           <version>0.5.2</version>
+       </dependency>
+       <dependency>
+           <groupId>co.aikar</groupId>
+           <artifactId>acf-parent</artifactId>
+           <version>0.5.0</version>
+           <type>pom</type>
+       </dependency>
+        <dependency>
+            <groupId>cloud.commandframework</groupId>
+            <artifactId>cloud-core</artifactId>
+            <version>1.7.1</version>
+        </dependency>
+        <!-- <dependency>
+            <groupId>cloud.commandframework</groupId>
+            <artifactId>cloud-bukkit</artifactId>
+            <version>1.7.1</version>
+        </dependency> -->
     </dependencies>
 </project>

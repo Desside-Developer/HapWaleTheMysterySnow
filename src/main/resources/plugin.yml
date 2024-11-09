@@ -6,15 +6,29 @@ commands:
   testCMFN:
     description: "I think test command."
     usage: /testCMFN
+    permission: stlplugin.command.testcmfn  # Пример кастомного разрешения
+
   setcenter:
     description: "Set center barrier."
     usage: "/setcenter [x] [y] [z]"
+    permission: stlplugin.command.setcenter  # Пример кастомного разрешения
+
   setradius:
     description: "Set radius barrier."
     usage: "/setradius <radius>"
+    permission: stlplugin.command.setradius  # Пример кастомного разрешения
+
   expandradius:
     description: "Expand radius barrier."
     usage: "/expandradius <add_radius>"
+    permission: stlplugin.command.expandradius  # Пример кастомного разрешения
+
   getTemperature:
     description: "Show temperature player on action bar."
     usage: "/getTemperature"
+    permission: stlplugin.command.gettemperature  # Пример кастомного разрешения
+
+  snowBarrier:
+    description: "Set snow barrier."
+    usage: "/snowBarrier <x> <y> <z> <radius> [Name: <name>]"
+    permission: stlplugin.command.snowbarrier  # Пример кастомного разрешения

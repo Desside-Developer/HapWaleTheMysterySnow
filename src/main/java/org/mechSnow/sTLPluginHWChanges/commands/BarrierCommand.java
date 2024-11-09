@@ -16,19 +16,26 @@ public class BarrierCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        // Проверяем, является ли отправитель игроком и есть ли у него OP
         if (!(sender instanceof Player)) {
             sender.sendMessage("Эту команду может выполнять только игрок.");
             return true;
         }
 
         Player player = (Player) sender;
+        
+        // Проверка на OP-права
+        if (!player.isOp()) {
+            player.sendMessage("У вас нет прав для выполнения этой команды.");
+            return false;
+        }
+
+        // Дальше обработка команд только для игроков с OP правами
         if (label.equalsIgnoreCase("setcenter")) {
             if (args.length == 0) {
-                // Установка центра на текущей позиции игрока
                 barrierManager.setBarrierCenter(player.getLocation());
                 player.sendMessage("Центр барьера установлен на вашей позиции.");
             } else if (args.length == 3) {
-                // Установка центра по указанным координатам
                 try {
                     double x = Double.parseDouble(args[0]);
                     double y = Double.parseDouble(args[1]);

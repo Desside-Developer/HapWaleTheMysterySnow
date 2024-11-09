@@ -13,7 +13,9 @@ import org.mechSnow.sTLPluginHWChanges.db.DbPlayerData;
 import org.mechSnow.sTLPluginHWChanges.managers.BarrierManager;
 import org.mechSnow.sTLPluginHWChanges.utils.ConfigUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -76,21 +78,22 @@ public class PlayerListener implements Listener {
                     double roundedY = Math.round(newY * 100.0) / 100.0;
                     double roundedZ = Math.round(newZ * 100.0) / 100.0;
                     
+                    barrierManager.handlePlayerPosition(player);
                     PlayerPosition playerPosition = PlayerListener.this.getPlayerPosition(player.getUniqueId());
                     if (playerPosition != null) {
-                        player.sendMessage(null, "HASHMAP -> X: " + playerPosition.getX() + " Y: " + playerPosition.getY() + " Z: " + playerPosition.getZ());
+                        // player.sendMessage(null, "HASHMAP -> X: " + playerPosition.getX() + " Y: " + playerPosition.getY() + " Z: " + playerPosition.getZ());
                     }
                     // else {
                     //     player.sendMessage(null, "Player position not found for player " + player.getName());
                     // }
                     double temperature = dbPlayerData.getPlayerTemperature(playerId);
-                    player.sendMessage("Player " + player.getName() + " temperature: " + temperature + " °Kelvin");
+                    // player.sendMessage("Player " + player.getName() + " temperature: " + temperature + " °Kelvin");
 
                     dbPlayerData.updatePlayerPosition(player, roundedX, roundedY, roundedZ);
-                    player.sendMessage(null, "X: " + roundedX + " Y: " + roundedY + " Z: " + roundedZ);
+                    // player.sendMessage(null, "X: " + roundedX + " Y: " + roundedY + " Z: " + roundedZ);
                 }
             }
-        }, 0L, 5L);
+        }, 0L, 20L);
     }
 
 
@@ -111,11 +114,16 @@ public class PlayerListener implements Listener {
     //     double roundedZ = Math.round(newZ * 100.0) / 100.0;
 
     //     // Обновляем позицию игрока
-    //     playerPositions.put(playerId, new PlayerPosition(roundedX, roundedY, roundedZ));
+    //     // playerPositions.put(playerId, new PlayerPosition(roundedX, roundedY, roundedZ));
 
     //     // Проверяем, находится ли игрок за границей барьера и обрабатываем его позицию
-    //     // barrierManager.handlePlayerPosition(player);
+    //     barrierManager.handlePlayerPosition(player);
     // }
+
+    public List<Player> getOnlinePlayers() {
+        return new ArrayList<>(Bukkit.getOnlinePlayers());
+    }
+
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
